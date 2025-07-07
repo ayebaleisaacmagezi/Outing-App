@@ -1,0 +1,774 @@
+--- File: ./test/widget_test.dart ---
+// This is a basic Flutter widget test.
+//
+// To perform an interaction with a widget in your test, use the WidgetTester
+// utility in the flutter_test package. For example, you can send tap and scroll
+// gestures. You can also use WidgetTester to find child widgets in the widget
+// tree, read text, and verify that the values of widget properties are correct.
+
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import 'package:myapp/main.dart';
+
+void main() {
+  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+    // Build our app and trigger a frame.
+    await tester.pumpWidget(const MyApp());
+
+    // Verify that our counter starts at 0.
+    expect(find.text('0'), findsOneWidget);
+    expect(find.text('1'), findsNothing);
+
+    // Tap the '+' icon and trigger a frame.
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pump();
+
+    // Verify that our counter has incremented.
+    expect(find.text('0'), findsNothing);
+    expect(find.text('1'), findsOneWidget);
+  });
+}
+
+--- File: ./lib/widgets.dart ---
+// lib/widgets.dart
+import 'package:flutter/material.dart';
+import '../models.dart';
+import '../main.dart' show AppColors;
+
+class VenueCard extends StatelessWidget {
+  final Venue venue;
+
+  const VenueCard({super.key, required this.venue});
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isOpen = venue.status == 'Open';
+    
+    // Define the gradient for the card's border and background
+    const cardGradient = LinearGradient(
+      colors: [
+        AppColors.darkSecondary,
+        const Color(0xFF16213E), // dark-accent
+      ],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16.0),
+      decoration: BoxDecoration(
+        gradient: cardGradient,
+        borderRadius: BorderRadius.circular(12.0),
+        border: Border.all(color: AppColors.electricCyan.withOpacity(0.2)),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.neonPurple.withOpacity(0.1),
+            blurRadius: 10,
+            spreadRadius: 2,
+          )
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Placeholder for the image
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: const Color(0xFF16213E), // dark-accent
+                borderRadius: BorderRadius.circular(8.0),
+                border: Border.all(color: AppColors.electricCyan.withOpacity(0.2)),
+              ),
+              child: Center(
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(4.0),
+                    gradient: const LinearGradient(
+                      colors: [AppColors.neonPurple, AppColors.electricCyan],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(venue.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                            Text(venue.type, style: TextStyle(color: Colors.grey[400], fontSize: 14)),
+                          ],
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          const Icon(Icons.star, color: AppColors.sunsetOrange, size: 16),
+                          const SizedBox(width: 4),
+                          Text(
+                            venue.rating.toString(),
+                            style: const TextStyle(color: AppColors.sunsetOrange, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Text(venue.distance, style: TextStyle(color: Colors.grey[400])),
+                      const SizedBox(width: 12),
+                      Text(venue.price, style: TextStyle(color: Colors.grey[400])),
+                      const Spacer(),
+                      // Status Badge
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: (isOpen ? AppColors.auroraGreen : AppColors.statusRed).withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: (isOpen ? AppColors.auroraGreen : AppColors.statusRed).withOpacity(0.3)),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.access_time, size: 12, color: isOpen ? AppColors.auroraGreen : AppColors.statusRed),
+                            const SizedBox(width: 4),
+                            Text(venue.status, style: TextStyle(fontSize: 12, color: isOpen ? AppColors.auroraGreen : AppColors.statusRed)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8.0,
+                    runSpacing: 4.0,
+                    children: venue.tags.map((tag) => Chip(label: Text(tag))).toList(),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+--- File: ./lib/services/mock_data_service.dart ---
+// lib/services/mock_data_service.dart
+
+import '../models.dart';
+
+class MockDataService {
+  // Hard-coded categories from the original app
+  final List<String> categories = [
+    "Restaurants",
+    "Bars",
+    "Coffee",
+    "Entertainment",
+    "Outdoor",
+    "Shopping",
+  ];
+
+  // Hard-coded list of venues from the original app
+  final List<Venue> _venues = [
+    Venue(
+      id: '1',
+      name: "The Rooftop Lounge",
+      type: "Bar & Grill",
+      rating: 4.5,
+      distance: "0.8 km",
+      price: "\$\$\$",
+      status: "Open",
+      tags: ["Trendy", "Lively"],
+      image: "placeholder", // We'll handle images later
+    ),
+    Venue(
+      id: '2',
+      name: "Cozy Corner Cafe",
+      type: "Coffee Shop",
+      rating: 4.2,
+      distance: "1.2 km",
+      price: "\$\$",
+      status: "Open",
+      tags: ["Quiet", "Cozy"],
+      image: "placeholder",
+    ),
+    Venue(
+      id: '3',
+      name: "Adventure Bowling",
+      type: "Entertainment",
+      rating: 4.7,
+      distance: "2.1 km",
+      price: "\$\$",
+      status: "Closed",
+      tags: ["Family-Friendly", "Fun"],
+      image: "placeholder",
+    ),
+  ];
+
+  // A method to simulate fetching venues from a network
+  Future<List<Venue>> getVenues() async {
+    // Simulate a network delay
+    await Future.delayed(const Duration(milliseconds: 800));
+    return _venues;
+  }
+}
+--- File: ./lib/main.dart ---
+// lib/main.dart
+
+import 'package:flutter/material.dart';
+// import 'package:google_fonts/google_fonts.dart'; // <--- REMOVED
+import 'package:provider/provider.dart';
+import 'providers.dart';
+import 'screens/home_screen.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AppNavProvider()),
+        ChangeNotifierProvider(create: (_) => DiscoverProvider()),
+      ],
+      child: const OutingApp(),
+    ),
+  );
+}
+
+// Define custom colors from your tailwind.config.ts
+class AppColors {
+  static const Color darkPrimary = Color(0xFF0A0A0F);
+  static const Color darkSecondary = Color(0xFF1A1A2E);
+  static const Color electricCyan = Color(0xFF00F5FF);
+  static const Color neonPurple = Color(0xFF8B5CF6);
+  static const Color auroraGreen = Color(0xFF10B981);
+  static const Color sunsetOrange = Color(0xFFF59E0B);
+  static const Color statusRed = Color(0xFFEF4444);
+}
+
+class OutingApp extends StatelessWidget {
+  const OutingApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'OutingApp',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: AppColors.darkPrimary,
+        primaryColor: AppColors.electricCyan,
+        
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          titleTextStyle: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        
+        // REMOVED the google_fonts textTheme line
+        
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: AppColors.darkSecondary.withOpacity(0.5),
+          hintStyle: const TextStyle(color: Colors.grey),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(color: AppColors.electricCyan.withOpacity(0.3)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: const BorderSide(color: AppColors.electricCyan),
+          ),
+        ),
+        chipTheme: ChipThemeData(
+          backgroundColor: AppColors.neonPurple.withOpacity(0.1),
+          labelStyle: const TextStyle(color: AppColors.neonPurple, fontSize: 12),
+          side: BorderSide(color: AppColors.neonPurple.withOpacity(0.3)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            foregroundColor: AppColors.darkPrimary,
+            backgroundColor: AppColors.electricCyan,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 16),
+          ),
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.electricCyan,
+            side: BorderSide(color: AppColors.electricCyan.withOpacity(0.3)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+             padding: const EdgeInsets.symmetric(vertical: 16),
+          ),
+        ),
+      ),
+      home: const HomeScreen(),
+    );
+  }
+}
+--- File: ./lib/screens/friends_screen.dart ---
+import 'package:flutter/material.dart';
+
+class FriendsScreen extends StatelessWidget {
+  const FriendsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: Text('Friends Screen'),
+      ),
+    );
+  }
+}
+--- File: ./lib/screens/profile_screen.dart ---
+import 'package:flutter/material.dart';
+
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: Text('Profile Screen'),
+      ),
+    );
+  }
+}
+--- File: ./lib/screens/home_screen.dart ---
+// lib/screens/home_screen.dart
+
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers.dart';
+import '../main.dart' show AppColors; // Import our custom colors
+import 'discover_screen.dart';
+import 'friends_screen.dart';
+import 'profile_screen.dart';
+import 'chat_screen.dart'; // We'll use this for the "Games" tab for now
+
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  // A list of the screens to be displayed
+  static const List<Widget> _screens = <Widget>[
+    DiscoverScreen(),
+    FriendsScreen(),
+    ChatScreen(), // Placeholder for Games
+    ProfileScreen(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    // Use a Consumer to listen for changes in the AppNavProvider
+    return Consumer<AppNavProvider>(
+      builder: (context, navProvider, child) {
+        return Scaffold(
+          body: IndexedStack(
+            index: navProvider.selectedIndex,
+            children: _screens,
+          ),
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: navProvider.selectedIndex,
+            onTap: (index) {
+              // Update the state when a tab is tapped
+              navProvider.selectedIndex = index;
+            },
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: AppColors.darkPrimary.withOpacity(0.95),
+            selectedItemColor: AppColors.electricCyan,
+            unselectedItemColor: Colors.grey[600],
+            showUnselectedLabels: true,
+            items: const <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(Icons.explore),
+                label: 'Discover',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.group),
+                label: 'Friends',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.sports_esports),
+                label: 'Games',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person),
+                label: 'Profile',
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+--- File: ./lib/screens/chat_screen.dart ---
+import 'package:flutter/material.dart';
+
+class ChatScreen extends StatelessWidget {
+  const ChatScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: Text('Games Screen'),
+      ),
+    );
+  }
+}
+--- File: ./lib/screens/auth_screen.dart ---
+
+--- File: ./lib/screens/discover_screen.dart ---
+// lib/screens/discover_screen.dart
+
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers.dart';
+import '../widgets.dart';
+import '../main.dart' show AppColors;
+
+class DiscoverScreen extends StatelessWidget {
+  const DiscoverScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // Watch for changes in the DiscoverProvider
+    final provider = context.watch<DiscoverProvider>();
+
+    return Scaffold(
+      body: CustomScrollView(
+        slivers: [
+          // --- HEADER ---
+          SliverAppBar(
+            floating: true,
+            pinned: true,
+            backgroundColor: AppColors.darkPrimary.withOpacity(0.9),
+            title: ShaderMask(
+              shaderCallback: (bounds) => const LinearGradient(
+                colors: [AppColors.neonPurple, AppColors.electricCyan],
+              ).createShader(bounds),
+              child: const Text('OutingApp'),
+            ),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: AppColors.sunsetOrange.withOpacity(0.3)),
+                  ),
+                  child: const Row(
+                    children: [
+                      // This is the animated pulse dot
+                      PulseDot(),
+                      SizedBox(width: 8),
+                      Text("Streak: 12", style: TextStyle(color: AppColors.sunsetOrange, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          // --- SEARCH, LOCATION & FILTERS ---
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  const TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Search places, friends, activities...',
+                      prefixIcon: Icon(Icons.search, color: AppColors.electricCyan),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.location_on, color: AppColors.electricCyan, size: 16),
+                          SizedBox(width: 4),
+                          Text("Downtown Area", style: TextStyle(color: Colors.white70)),
+                        ],
+                      ),
+                      OutlinedButton.icon(
+                        onPressed: () {},
+                        icon: const Icon(Icons.filter_list, size: 16),
+                        label: const Text('Filters'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.electricCyan,
+                          side: BorderSide(color: AppColors.electricCyan.withOpacity(0.3)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // --- CATEGORIES ---
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: 40,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                itemCount: provider.categories.length,
+                itemBuilder: (context, index) {
+                  final category = provider.categories[index];
+                  final bool isActive = category == provider.activeCategory;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: isActive
+                      ? ElevatedButton(onPressed: () {}, child: Text(category))
+                      : OutlinedButton(
+                          onPressed: () => provider.selectCategory(category),
+                          child: Text(category),
+                        ),
+                  );
+                },
+              ),
+            ),
+          ),
+          
+          // --- ACTION BUTTONS ---
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+              child: Row(
+                children: [
+                  Expanded(child: ElevatedButton.icon(onPressed: () {}, icon: const Icon(Icons.add), label: const Text('Create Outing'))),
+                  const SizedBox(width: 12),
+                  Expanded(child: OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.chat_bubble_outline), label: const Text('Group Chat'))),
+                ],
+              ),
+            ),
+          ),
+
+          // --- NEAR YOU LIST ---
+          const SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                'Near You',
+                style: TextStyle(color: AppColors.electricCyan, fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+          provider.isLoading
+            ? const SliverToBoxAdapter(child: Center(child: Padding(padding: EdgeInsets.all(32.0), child: CircularProgressIndicator())))
+            : SliverPadding(
+                padding: const EdgeInsets.all(16.0),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final venue = provider.venues[index];
+                      return VenueCard(venue: venue);
+                    },
+                    childCount: provider.venues.length,
+                  ),
+                ),
+              ),
+        ],
+      ),
+    );
+  }
+}
+
+// A simple widget for the pulsing dot animation
+class PulseDot extends StatefulWidget {
+  const PulseDot({super.key});
+  @override
+  State<PulseDot> createState() => _PulseDotState();
+}
+
+class _PulseDotState extends State<PulseDot> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _controller,
+      child: Container(
+        width: 8,
+        height: 8,
+        decoration: const BoxDecoration(
+          color: AppColors.sunsetOrange,
+          shape: BoxShape.circle,
+        ),
+      ),
+    );
+  }
+}
+--- File: ./lib/providers.dart ---
+// lib/providers.dart
+
+import 'package:flutter/material.dart';
+import 'models.dart';
+import 'services/mock_data_service.dart';
+
+// Provider to manage the selected index of the BottomNavigationBar
+class AppNavProvider with ChangeNotifier {
+  int _selectedIndex = 0;
+
+  int get selectedIndex => _selectedIndex;
+
+  set selectedIndex(int index) {
+    _selectedIndex = index;
+    notifyListeners(); // This tells the UI to rebuild
+  }
+}
+
+// Provider for the Discover Screen's state
+class DiscoverProvider with ChangeNotifier {
+  final MockDataService _mockDataService = MockDataService();
+
+  late List<String> _categories;
+  List<Venue> _venues = [];
+  String _activeCategory = "Restaurants";
+  bool _isLoading = false;
+
+  // Public getters
+  List<String> get categories => _categories;
+  List<Venue> get venues => _venues;
+  String get activeCategory => _activeCategory;
+  bool get isLoading => _isLoading;
+
+  DiscoverProvider() {
+    // When the provider is created, get the initial data
+    _categories = _mockDataService.categories;
+    fetchVenues();
+  }
+
+  // Method to fetch data from our mock service
+  Future<void> fetchVenues() async {
+    _isLoading = true;
+    notifyListeners();
+
+    _venues = await _mockDataService.getVenues();
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  // Method to update the active category
+  void selectCategory(String category) {
+    _activeCategory = category;
+    notifyListeners();
+    // In a real app, you might re-fetch venues based on the new category here
+  }
+}
+--- File: ./lib/models.dart ---
+// lib/models.dart
+
+class Venue {
+  final String id;
+  final String name;
+  final String type;
+  final double rating;
+  final String distance;
+  final String price;
+  final String status;
+  final List<String> tags;
+  final String image;
+
+  Venue({
+    required this.id,
+    required this.name,
+    required this.type,
+    required this.rating,
+    required this.distance,
+    required this.price,
+    required this.status,
+    required this.tags,
+    required this.image,
+  });
+}
+--- File: ./lib/firebase.dart ---
+
+--- File: ./README.md ---
+# myapp
+
+A new Flutter project.
+
+## Getting Started
+
+This project is a starting point for a Flutter application.
+
+A few resources to get you started if this is your first Flutter project:
+
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.
+
+--- File: ./pubspec.yaml ---
+name: outing
+description: A Flutter clone of the OutingApp.
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.3 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  google_fonts: ^6.1.0
+  provider: ^6.1.1
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^3.0.1
+
+
