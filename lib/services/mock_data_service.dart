@@ -9,10 +9,9 @@ class MockDataService {
   final List<String> categories = [
     "Restaurants",
     "Bars",
-    "Coffee",
+    "Events",
     "Entertainment",
-    "Outdoor",
-    "Shopping",
+    "Near You",
   ];
 
   // Hard-coded list of mock friends
@@ -35,33 +34,39 @@ class MockDataService {
       name: "The Rooftop Lounge",
       type: "Bar & Grill",
       rating: 4.5,
-      distance: "0.8 km",
+      latitude: 37.7749,  // <-- ADD THIS
+      longitude: -122.4194,
       price: "\$\$\$",
       status: "Open",
       tags: ["Trendy", "Lively"],
       image: "placeholder",
+      category: "Bars", 
     ),
     Venue(
       id: '2',
       name: "Cozy Corner Cafe",
       type: "Coffee Shop",
       rating: 4.2,
-      distance: "1.2 km",
+      latitude: 37.7858,  // <-- ADD THIS
+      longitude: -122.4011, 
       price: "\$\$",
       status: "Open",
       tags: ["Quiet", "Cozy"],
       image: "placeholder",
+      category: "Coffee",
     ),
     Venue(
       id: '3',
       name: "Adventure Bowling",
       type: "Entertainment",
       rating: 4.7,
-      distance: "2.1 km",
+      latitude: 37.7725,  // <-- ADD THIS
+      longitude: -122.4313,
       price: "\$\$",
       status: "Closed",
       tags: ["Family-Friendly", "Fun"],
       image: "placeholder",
+      category: "Entertainment",
     ),
   ];
 

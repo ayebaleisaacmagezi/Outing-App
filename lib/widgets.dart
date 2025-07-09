@@ -1,16 +1,34 @@
 // lib/widgets.dart
 import 'package:flutter/material.dart';
 import '../models.dart';
+import 'package:geolocator/geolocator.dart';
 import '../main.dart' show AppColors;
 
 class VenueCard extends StatelessWidget {
   final Venue venue;
+  final Position? currentPosition;
 
-  const VenueCard({super.key, required this.venue});
+  const VenueCard({super.key, required this.venue, this.currentPosition,});
+
+    // Helper to calculate and format distance
+  String _getFormattedDistance() {
+    if (currentPosition == null) {
+      return ''; // Return empty if we don't have user's location
+    }
+    final distanceInMeters = Geolocator.distanceBetween(
+      currentPosition!.latitude,
+      currentPosition!.longitude,
+      venue.latitude,
+      venue.longitude,
+    );
+    final distanceInKm = distanceInMeters / 1000;
+    return '${distanceInKm.toStringAsFixed(1)} km';
+  }
 
   @override
   Widget build(BuildContext context) {
     final bool isOpen = venue.status == 'Open';
+    final String displayDistance = _getFormattedDistance(); // Calculate distance
     
     const cardGradient = LinearGradient(
       colors: [
@@ -94,8 +112,10 @@ class VenueCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Text(venue.distance, style: TextStyle(color: Colors.grey[400])),
-                      const SizedBox(width: 12),
+                      if (displayDistance.isNotEmpty) ...[ 
+                        Text(displayDistance, style: TextStyle(color: Colors.grey[400])),
+                        const SizedBox(width: 12),
+                      ],
                       Text(venue.price, style: TextStyle(color: Colors.grey[400])),
                       const Spacer(),
                       Container(

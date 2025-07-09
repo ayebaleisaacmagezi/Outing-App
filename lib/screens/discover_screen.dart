@@ -171,7 +171,7 @@ class DiscoverScreen extends StatelessWidget {
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       final venue = provider.venues[index];
-                      return VenueCard(venue: venue);
+                      return VenueCard(venue: venue, currentPosition: provider.currentPosition, );
                     },
                     childCount: provider.venues.length,
                   ),

@@ -5,22 +5,26 @@ class Venue {
   final String name;
   final String type;
   final double rating;
-  final String distance;
+  final double latitude;
+  final double longitude;
   final String price;
   final String status;
   final List<String> tags;
   final String image;
+  final String category;
 
   Venue({
     required this.id,
     required this.name,
     required this.type,
     required this.rating,
-    required this.distance,
+    required this.latitude,   // <-- ADD THIS
+    required this.longitude,
     required this.price,
     required this.status,
     required this.tags,
     required this.image,
+    required this.category,
   });
 }
 
