@@ -1,11 +1,10 @@
 // lib/screens/games_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers.dart';
 import '../models.dart';
-import '../main.dart' show AppColors;
-import '../widgets.dart' show GradientButton; // We'll reuse our button
+import '../main.dart' show AppColors, AppGradients;
+import '../widgets/gradient_button.dart'; // <-- CORRECT IMPORT
 
 class GamesScreen extends StatelessWidget {
   const GamesScreen({super.key});
@@ -13,26 +12,26 @@ class GamesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<GameProvider>();
-    final games = provider.games;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Games & Challenges'),
         centerTitle: true,
+        backgroundColor: AppColors.darkPrimary,
       ),
-      body: provider.isLoading
+      body: provider.isLoading || provider.games.isEmpty
           ? const Center(child: CircularProgressIndicator())
           : ListView(
               padding: const EdgeInsets.all(16.0),
               children: [
-                _buildFeaturedGameCard(context, games.first),
+                _buildFeaturedGameCard(context, provider.games.first),
                 const SizedBox(height: 24),
                 Text(
                   'All Games',
-                  style: Theme.of(context).textTheme.headlineSmall,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
-                ...games.skip(1).map((game) => _buildGameListItem(game)),
+                ...provider.games.skip(1).map((game) => _buildGameListItem(game)),
               ],
             ),
     );
@@ -43,7 +42,7 @@ class GamesScreen extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [AppColors.neonPurple, AppColors.cosmic_purple],
+          colors: [AppColors.neonPurple, AppColors.cosmicPurple],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -52,16 +51,16 @@ class GamesScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('FEATURED GAME', style: TextStyle(color: Colors.white70, letterSpacing: 1.5)),
+          Text('FEATURED GAME', style: TextStyle(color: Colors.white.withOpacity(0.8), letterSpacing: 1.5, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
-          Text(game.title, style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
+          Text(game.title, style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold, color: Colors.white)),
           const SizedBox(height: 8),
-          Text(game.description, style: const TextStyle(fontSize: 16, color: Colors.white70)),
+          Text(game.description, style: TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.8), height: 1.4)),
           const SizedBox(height: 20),
           GradientButton(
             onPressed: () {},
             borderRadius: 12,
-            gradient: const LinearGradient(colors: [AppColors.electricCyan, AppColors.auroraGreen]),
+            gradient: AppGradients.aurora, // Using predefined gradient
             child: const Text('Play Now', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
@@ -87,12 +86,12 @@ class GamesScreen extends StatelessWidget {
               children: [
                 Text(game.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
-                Text(game.description, style: const TextStyle(color: Colors.white70)),
+                Text(game.description, style: TextStyle(color: Colors.grey[400])),
               ],
             ),
           ),
           const SizedBox(width: 16),
-          const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.white70),
+          Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[600]),
         ],
       ),
     );

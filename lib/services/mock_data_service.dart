@@ -1,5 +1,3 @@
-
-
 import '../models.dart';
 import 'package:flutter/material.dart'; // <-- Add this import for IconData
 
@@ -31,8 +29,8 @@ class MockDataService {
   final List<Venue> _venues = [
     Venue(
       id: '1',
-      name: "The Rooftop Lounge",
-      type: "Bar & Grill",
+      name: "Yums Cafe",
+      type: "Restaurant",
       rating: 4.5,
       latitude: 37.7749,  // <-- ADD THIS
       longitude: -122.4194,
@@ -40,12 +38,12 @@ class MockDataService {
       status: "Open",
       tags: ["Trendy", "Lively"],
       image: "placeholder",
-      category: "Bars", 
+      category: "Restaurants", 
     ),
     Venue(
       id: '2',
-      name: "Cozy Corner Cafe",
-      type: "Coffee Shop",
+      name: "Asian Fusion Restaurant",
+      type: "Asian Cuisine",
       rating: 4.2,
       latitude: 37.7858,  // <-- ADD THIS
       longitude: -122.4011, 
@@ -53,11 +51,11 @@ class MockDataService {
       status: "Open",
       tags: ["Quiet", "Cozy"],
       image: "placeholder",
-      category: "Coffee",
+      category: "Restaurants",
     ),
     Venue(
       id: '3',
-      name: "Adventure Bowling",
+      name: "Century Cinemax",
       type: "Entertainment",
       rating: 4.7,
       latitude: 37.7725,  // <-- ADD THIS
@@ -67,6 +65,45 @@ class MockDataService {
       tags: ["Family-Friendly", "Fun"],
       image: "placeholder",
       category: "Entertainment",
+    ),
+     Venue(
+      id: '4',
+      name: "National Theatre",
+      type: "Entertainment",
+      rating: 4.7,
+      latitude: 37.7725,  // <-- ADD THIS
+      longitude: -122.4313,
+      price: "\$\$",
+      status: "Closed",
+      tags: ["Family-Friendly", "Fun"],
+      image: "placeholder",
+      category: "Entertainment",
+    ),
+        Venue(
+      id: '5',
+      name: "The Bourbon",
+      type: "Entertainment",
+      rating: 4.7,
+      latitude: 37.7725,  // <-- ADD THIS
+      longitude: -122.4313,
+      price: "\$\$",
+      status: "Closed",
+      tags: ["Family-Friendly", "Fun"],
+      image: "placeholder",
+      category: "Bars",
+    ),
+        Venue(
+      id: '6',
+      name: "Ninety9 By The Embers",
+      type: "Nightlife",
+      rating: 4.7,
+      latitude: 37.7725,  // <-- ADD THIS
+      longitude: -122.4313,
+      price: "\$\$",
+      status: "Closed",
+      tags: ["Family-Friendly", "Fun"],
+      image: "placeholder",
+      category: "Bars",
     ),
   ];
 

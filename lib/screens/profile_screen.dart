@@ -1,5 +1,4 @@
 // lib/screens/profile_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers.dart';
@@ -13,7 +12,6 @@ class ProfileScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
-        centerTitle: true,
       ),
       body: Consumer<ProfileProvider>(
         builder: (context, provider, child) {
@@ -27,7 +25,6 @@ class ProfileScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             children: [
               const SizedBox(height: 20),
-              // Profile Avatar and Name
               Column(
                 children: [
                   Container(
@@ -35,10 +32,13 @@ class ProfileScreen extends StatelessWidget {
                       shape: BoxShape.circle,
                       border: Border.all(color: AppColors.electricCyan, width: 3),
                     ),
-                    child: const CircleAvatar(
+                    child: CircleAvatar(
                       radius: 50,
                       backgroundColor: AppColors.darkSecondary,
-                      child: Icon(Icons.person, size: 50, color: AppColors.electricCyan),
+                      // Using a placeholder image or icon
+                      child: user.photoUrl == 'placeholder'
+                          ? const Icon(Icons.person, size: 50, color: AppColors.electricCyan)
+                          : ClipOval(child: Image.network(user.photoUrl, fit: BoxFit.cover)),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -48,7 +48,6 @@ class ProfileScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 30),
-              // Menu List
               _buildMenuList(context),
             ],
           );

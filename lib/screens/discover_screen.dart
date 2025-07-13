@@ -1,10 +1,10 @@
 // lib/screens/discover_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers.dart';
-import '../widgets.dart';
-import '../main.dart' show AppColors;
+import '../widgets/venue_card.dart';
+import '../widgets/glow_button.dart';
+import '../main.dart' show AppColors, AppGradients;
 
 class DiscoverScreen extends StatelessWidget {
   const DiscoverScreen({super.key});
@@ -16,182 +16,284 @@ class DiscoverScreen extends StatelessWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar(
-            floating: true,
-            pinned: true,
-            backgroundColor: AppColors.darkPrimary.withAlpha(230), // CORRECTED
-            title: ShaderMask(
-              shaderCallback: (bounds) => const LinearGradient(
-                colors: [AppColors.neonPurple, AppColors.electricCyan],
-              ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
-              child: const Text('OutingApp'),
-            ),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.only(right: 16.0),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: AppColors.darkSecondary,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.sunsetOrange.withAlpha(77)), // CORRECTED
-                  ),
-                  child: const Row(
-                    children: [
-                      PulseDot(),
-                      SizedBox(width: 8),
-                      Text("Streak: 12", style: TextStyle(color: AppColors.sunsetOrange, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+          const _OutingAppBar(),
+          const _SearchSection(),
+          _CategoriesRow(
+            categories: provider.categories,
+            activeCategory: provider.activeCategory,
+            onCategorySelected: (category) => provider.selectCategory(category),
           ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  const TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Search places, friends, activities...',
-                      prefixIcon: Icon(Icons.search, color: AppColors.electricCyan),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Row(
-                        children: [
-                          Icon(Icons.location_on, color: AppColors.electricCyan, size: 16),
-                          SizedBox(width: 4),
-                          Text("Downtown Area", style: TextStyle(color: Colors.white70)),
-                        ],
-                      ),
-                      OutlinedButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.filter_list, size: 16),
-                        label: const Text('Filters'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.electricCyan,
-                          side: BorderSide(color: AppColors.electricCyan.withAlpha(77)), // CORRECTED
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8)
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: 36,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                itemCount: provider.categories.length,
-                itemBuilder: (context, index) {
-                  final category = provider.categories[index];
-                  final bool isActive = category == provider.activeCategory;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: isActive
-                      ? GradientButton(
-                          onPressed: () {},
-                          borderRadius: 20,
-                          child: Text(
-                            category,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        )
-                      : OutlinedButton(
-                          onPressed: () => provider.selectCategory(category),
-                          style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.grey[300],
-                              side: BorderSide(color: AppColors.electricCyan.withAlpha(77)), // CORRECTED
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))
-                          ),
-                          child: Text(category),
-                        ),
-                  );
-                },
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: GradientButton(
-                      onPressed: () {},
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.add, size: 20),
-                          SizedBox(width: 8),
-                          Text('Create Outing', style: TextStyle(fontWeight: FontWeight.bold)),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.chat_bubble_outline, size: 20),
-                      label: const Text('Group Chat'),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14)
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Text(
-                'Near You',
-                style: TextStyle(color: AppColors.electricCyan, fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-          provider.isLoading
-            ? const SliverToBoxAdapter(child: Center(child: Padding(padding: EdgeInsets.all(32.0), child: CircularProgressIndicator())))
-            : SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final venue = provider.venues[index];
-                      return VenueCard(venue: venue, currentPosition: provider.currentPosition, );
-                    },
-                    childCount: provider.venues.length,
-                  ),
-                ),
-              ),
+          const _ActionButtons(),
+          const _NearYouHeader(),
+          _buildVenueList(provider),
         ],
+      ),
+    );
+  }
+
+  Widget _buildVenueList(DiscoverProvider provider) {
+    if (provider.isLoading) {
+      return const SliverFillRemaining(
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    
+    if (provider.venues.isEmpty && !provider.isLoading) {
+       return const SliverFillRemaining(
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.all(24.0),
+            child: Text(
+              "No venues found for the selected category.",
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey, fontSize: 16),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return SliverPadding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            final venue = provider.venues[index];
+            return VenueCard(
+              venue: venue,
+              currentPosition: provider.currentPosition,
+            );
+          },
+          childCount: provider.venues.length,
+        ),
       ),
     );
   }
 }
 
-class PulseDot extends StatefulWidget {
-  const PulseDot({super.key});
+// Private sub-widgets for discover_screen.dart
+class _OutingAppBar extends StatelessWidget {
+  const _OutingAppBar();
   @override
-  State<PulseDot> createState() => _PulseDotState();
+  Widget build(BuildContext context) {
+    return SliverAppBar(
+      floating: true,
+      pinned: true,
+      backgroundColor: AppColors.darkPrimary.withOpacity(0.95),
+      title: ShaderMask(
+        shaderCallback: (bounds) => AppGradients.aurora.createShader(bounds),
+        child: const Text('OutingApp',
+            style: TextStyle(fontWeight: FontWeight.bold)),
+      ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 16.0),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppColors.darkSecondary.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppColors.sunsetOrange.withOpacity(0.3)),
+            ),
+            child: const Row(
+              children: [
+                _PulseDot(),
+                SizedBox(width: 8),
+                Text("Streak: 12",
+                    style: TextStyle(
+                        color: AppColors.sunsetOrange,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14)),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
-class _PulseDotState extends State<PulseDot> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+class _SearchSection extends StatelessWidget {
+  const _SearchSection();
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            const TextField(
+              decoration: InputDecoration(
+                hintText: 'Search places, friends, activities...',
+                prefixIcon:
+                    Icon(Icons.search, color: AppColors.electricCyan),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.location_on_outlined,
+                        color: AppColors.electricCyan, size: 16),
+                    const SizedBox(width: 8),
+                    Text("Downtown Area",
+                        style: TextStyle(color: Colors.grey[300])),
+                  ],
+                ),
+                TextButton.icon(
+                  onPressed: () {},
+                  icon: const Icon(Icons.filter_list, size: 16),
+                  label: const Text('Filters'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.electricCyan,
+                    backgroundColor: AppColors.darkSecondary.withOpacity(0.5),
+                    side:
+                        BorderSide(color: AppColors.electricCyan.withOpacity(0.3)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
+class _CategoriesRow extends StatelessWidget {
+  final List<String> categories;
+  final String activeCategory;
+  final Function(String) onCategorySelected;
+
+  const _CategoriesRow({
+    required this.categories,
+    required this.activeCategory,
+    required this.onCategorySelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: SizedBox(
+        height: 36,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          itemCount: categories.length,
+          itemBuilder: (context, index) {
+            final category = categories[index];
+            final bool isActive = category == activeCategory;
+            
+            Widget button = OutlinedButton(
+              onPressed: () => onCategorySelected(category),
+              child: Text(category),
+            );
+
+            if (isActive) {
+              return Container(
+                margin: const EdgeInsets.only(right: 8.0),
+                decoration: BoxDecoration(
+                  gradient: AppGradients.aurora,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: ElevatedButton(
+                  onPressed: () {},
+                  style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
+                    backgroundColor: const MaterialStatePropertyAll(Colors.transparent),
+                    shadowColor: const MaterialStatePropertyAll(Colors.transparent),
+                  ),
+                  child: Text(category),
+                ),
+              );
+            }
+
+            return Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: button,
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _ActionButtons extends StatelessWidget {
+  const _ActionButtons();
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: GlowButton(
+                onPressed: () {},
+                gradient: AppGradients.aurora,
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.add, size: 20),
+                    SizedBox(width: 8),
+                    Text('Create Outing'),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () {},
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.chat_bubble_outline, size: 20),
+                    SizedBox(width: 8),
+                    Text('Group Chat'),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NearYouHeader extends StatelessWidget {
+  const _NearYouHeader();
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 8.0),
+        child: Text(
+          'Near You',
+          style: TextStyle(
+            color: Theme.of(context).primaryColor,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PulseDot extends StatefulWidget {
+  const _PulseDot();
+  @override
+  State<_PulseDot> createState() => _PulseDotState();
+}
+
+class _PulseDotState extends State<_PulseDot> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
   @override
   void initState() {
     super.initState();
@@ -200,13 +302,11 @@ class _PulseDotState extends State<PulseDot> with SingleTickerProviderStateMixin
       duration: const Duration(seconds: 1),
     )..repeat(reverse: true);
   }
-
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return FadeTransition(

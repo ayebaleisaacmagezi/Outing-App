@@ -20,7 +20,8 @@ class AppNavProvider with ChangeNotifier {
 // Provider for the Discover Screen's state
 class DiscoverProvider with ChangeNotifier {
   final MockDataService _mockDataService = MockDataService();
-  static const double _nearYouRadiusMeters = 1506500;
+  static const double _nearYouRadiusMeters = 15079500; // in metres radius for "Near You"
+  // This is a large radius to simulate "Near You" for testing purposes.
 
   late List<String> _categories;
   List<Venue> _allVenues = []; 
