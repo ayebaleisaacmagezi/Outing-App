@@ -2,14 +2,70 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'signup_screen.dart';
+import '../../services/auth_service.dart';
 import '../../widgets/auth_scaffold.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/auth_social_button.dart';
 import '../../widgets/glow_button.dart';
+import '../home_screen.dart'; 
 import '../../main.dart' show AppGradients;
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  final AuthService _authService = AuthService();
+  bool _isLoading = false;
+
+   @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  // Method to handle the login logic
+  void _handleLogin() async {
+    print("--- LOGIN BUTTON TAPPED ---");
+    String email = _emailController.text.trim();
+    String password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all fields')),
+      );
+      return;
+    }
+
+    setState(() { _isLoading = true; });
+
+    // Call the sign-in method from our service
+    final user = await _authService.signInWithEmailAndPassword(email, password);
+
+    setState(() { _isLoading = false; });
+
+    if (user != null && mounted) {
+      // If login is successful, navigate to the HomeScreen
+      print("Login successful! User: ${user.uid}");
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        (route) => false, // This removes auth screens from back stack
+      );
+    } else {
+      // If login fails, show an error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Login failed. Please check your credentials.')),
+      );
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -34,12 +90,14 @@ class LoginScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 40),
-          const CustomTextField(
+          CustomTextField(
+            controller: _emailController,
             hintText: 'Email',
             icon: Icons.alternate_email,
           ),
           const SizedBox(height: 20),
-          const CustomTextField(
+          CustomTextField(
+            controller: _passwordController,
             hintText: 'Password',
             icon: Icons.lock_outline,
             isPassword: true,
@@ -48,7 +106,7 @@ class LoginScreen extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: GlowButton(
-              onPressed: () {},
+              onPressed: _handleLogin,
               gradient: AppGradients.aurora,
               child: const Text('Login'),
             ),

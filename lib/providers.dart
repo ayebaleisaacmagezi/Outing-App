@@ -39,8 +39,8 @@ class DiscoverProvider with ChangeNotifier {
 
   DiscoverProvider() {
     // When the provider is created, get the initial data
-    _categories = _mockDataService.categories;
-    fetchVenues();
+    _categories = _mockDataService.categories; // This line is the problem
+  fetchVenues();
     _initializeDiscoverFeed();
   }
 
@@ -105,9 +105,10 @@ class DiscoverProvider with ChangeNotifier {
         _activeCategory = category;
         _filterVenues(); // Re-filter the list with the new category
         notifyListeners();
-    }
+     }
     // In a real app, you might re-fetch venues based on the new category here
-  }
+    }
+
 
   void _filterVenues() {
     if (_activeCategory == "Near You") {

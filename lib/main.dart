@@ -1,10 +1,17 @@
 // lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart'; // <-- 1. IMPORT
+import 'firebase_options.dart';
 import 'providers.dart';
-import 'screens/auth/signup_screen.dart'; // Start with Sign Up Screen
+import 'screens/auth/login_screen.dart'; // Start with Sign Up Screen
 
-void main() {
+Future<void> main() async {
+  // 4. INITIALIZE WIDGETS AND FIREBASE
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(
     MultiProvider(
       providers: [
@@ -112,7 +119,7 @@ class OutingApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const SignUpScreen(),
+      home: const LoginScreen(),
     );
   }
 }

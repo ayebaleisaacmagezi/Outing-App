@@ -1,16 +1,1 @@
-{
-  "hosting": {
-    "public": "build/web",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ]
-  }
-}
+{"flutter":{"platforms":{"android":{"default":{"projectId":"whats-the-planno","appId":"1:537430777581:android:96c80f3736769b5a3d76e4","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"whats-the-planno","configurations":{"android":"1:537430777581:android:96c80f3736769b5a3d76e4","web":"1:537430777581:web:4e0bb0241f3e526d3d76e4"}}}}}}
