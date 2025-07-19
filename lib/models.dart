@@ -12,6 +12,11 @@ class Venue {
   final List<String> tags;
   final String image;
   final String category;
+  final String? websiteUrl;
+  final String? instagramUrl;
+  final String? phoneNumber;
+  final String? whatsappNumber;
+  final bool isFavorite;
 
   Venue({
     required this.id,
@@ -25,6 +30,11 @@ class Venue {
     required this.tags,
     required this.image,
     required this.category,
+    this.websiteUrl,
+    this.instagramUrl,
+    this.phoneNumber,
+    this.whatsappNumber,
+    this.isFavorite = false,
   });
 }
 

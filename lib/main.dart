@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart'; // <-- 1. IMPORT
 import 'firebase_options.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'providers.dart';
-import 'screens/auth/login_screen.dart'; // Start with Sign Up Screen
+import 'screens/auth/auth_gate.dart'; // Start with Sign Up Screen
 
 Future<void> main() async {
   // 4. INITIALIZE WIDGETS AND FIREBASE
@@ -12,6 +13,8 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  await initializeDateFormatting();
   runApp(
     MultiProvider(
       providers: [
@@ -119,7 +122,7 @@ class OutingApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const LoginScreen(),
+      home: const AuthGate(),
     );
   }
 }

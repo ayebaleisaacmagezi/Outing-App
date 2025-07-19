@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import '../main.dart' show AppColors, AppGradients;
 import '../models.dart';
 import 'tag_badge.dart';
+import '../screens/place_detail_screen.dart';
 
 class VenueCard extends StatelessWidget {
   final Venue venue;
@@ -33,32 +34,42 @@ class VenueCard extends StatelessWidget {
     final statusColor = isOpen ? AppColors.auroraGreen : AppColors.statusRed;
     final String displayDistance = _getFormattedDistance();
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16.0),
-      decoration: BoxDecoration(
-        gradient: AppGradients.card,
-        borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: AppColors.electricCyan.withOpacity(0.2)),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.neonPurple.withOpacity(0.1),
-            blurRadius: 15,
-            spreadRadius: 1,
-          )
-        ],
-      ),
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => PlaceDetailScreen(venue: venue),
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16.0),
+        decoration: BoxDecoration(
+          gradient: AppGradients.card,
+          borderRadius: BorderRadius.circular(16.0),
+          border: Border.all(color: AppColors.electricCyan.withOpacity(0.2)),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.neonPurple.withOpacity(0.1),
+              blurRadius: 15,
+              spreadRadius: 1,
+            )
+          ],
+        ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: AppColors.darkSecondary,
-                borderRadius: BorderRadius.circular(12.0),
-                border: Border.all(color: AppColors.electricCyan.withOpacity(0.2)),
+            Hero(
+              tag: 'venue-image-${venue.id}',
+              child: Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: AppColors.darkSecondary,
+                  borderRadius: BorderRadius.circular(12.0),
+                  border: Border.all(color: AppColors.electricCyan.withOpacity(0.2)),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(12.0),
@@ -67,6 +78,7 @@ class VenueCard extends StatelessWidget {
                   colorFilter:
                       const ColorFilter.mode(AppColors.electricCyan, BlendMode.srcIn),
                 ),
+              ),
               ),
             ),
             const SizedBox(width: 16),
@@ -141,6 +153,7 @@ class VenueCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

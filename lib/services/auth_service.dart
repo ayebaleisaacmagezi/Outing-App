@@ -6,6 +6,7 @@ class AuthService {
   // Get an instance of Firebase Auth
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  User? get currentUser => _auth.currentUser;
   // SIGN UP with email and password
   Future<User?> signUpWithEmailAndPassword(String email, String password, String displayName) async {
     try {
@@ -56,5 +57,13 @@ class AuthService {
       return null;
     }
   }
+
+  Future<void> signOut() async {
+  try {
+    await _auth.signOut();
+  } catch (e) {
+    print("An error occurred during sign out: $e");
+  }
+}
   // We will add more methods here later (signIn, signOut, etc.)
 }

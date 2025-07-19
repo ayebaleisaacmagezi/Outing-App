@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers.dart';
 import '../main.dart' show AppColors;
+import '../services/auth_service.dart'; // <-- 1. IMPORT AuthService
+import 'auth/login_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -18,7 +20,14 @@ class ProfileScreen extends StatelessWidget {
           if (provider.isLoading || provider.user == null) {
             return const Center(child: CircularProgressIndicator());
           }
-
+           if (provider.user == null) {
+            return const Center(
+              child: Text(
+                'Not logged in.',
+                style: TextStyle(color: Colors.grey, fontSize: 18),
+              ),
+            );
+          }
           final user = provider.user!;
 
           return ListView(
@@ -57,6 +66,7 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildMenuList(BuildContext context) {
+    final AuthService authService = AuthService();
     return Container(
       decoration: BoxDecoration(
         color: AppColors.darkSecondary,
@@ -86,7 +96,15 @@ class ProfileScreen extends StatelessWidget {
             icon: Icons.logout,
             text: 'Log Out',
             color: AppColors.sunsetOrange,
-            onTap: () {},
+            onTap: ()async {
+              await authService.signOut();
+              if (context.mounted) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (route) => false,
+                );
+              }
+            },
           ),
         ],
       ),

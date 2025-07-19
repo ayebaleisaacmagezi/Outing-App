@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers.dart';
 import '../widgets/venue_card.dart';
+import '../widgets/filters_bottom_sheet.dart';
 import '../widgets/glow_button.dart';
 import '../main.dart' show AppColors, AppGradients;
 
@@ -19,7 +20,7 @@ class DiscoverScreen extends StatelessWidget {
           const _OutingAppBar(),
           const _SearchSection(),
           _CategoriesRow(
-            categories: provider.categories,
+            categories: provider.primaryCategories,
             activeCategory: provider.activeCategory,
             onCategorySelected: (category) => provider.selectCategory(category),
           ),
@@ -143,7 +144,14 @@ class _SearchSection extends StatelessWidget {
                   ],
                 ),
                 TextButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => const FiltersBottomSheet(),
+                    );
+                  },
                   icon: const Icon(Icons.filter_list, size: 16),
                   label: const Text('Filters'),
                   style: TextButton.styleFrom(
@@ -190,6 +198,10 @@ class _CategoriesRow extends StatelessWidget {
             
             Widget button = OutlinedButton(
               onPressed: () => onCategorySelected(category),
+              style: Theme.of(context).outlinedButtonTheme.style?.copyWith(
+                    padding: const MaterialStatePropertyAll(EdgeInsets.symmetric(horizontal: 16)),
+                    textStyle: const MaterialStatePropertyAll(TextStyle(fontWeight: FontWeight.w500)),
+              ),
               child: Text(category),
             );
 

@@ -39,7 +39,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     // Get the values from the controllers
     String displayName = _displayNameController.text.trim();
     String email = _emailController.text.trim();
-    String password = _passwordController.text.trim();
+    String password = _passwordController.text;
 
     // Basic validation
     if (displayName.isEmpty || email.isEmpty || password.isEmpty) {

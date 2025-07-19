@@ -39,6 +39,10 @@ class MockDataService {
       tags: ["Trendy", "Lively"],
       image: "placeholder",
       category: "Restaurants", 
+      websiteUrl: 'https://example.com',
+      instagramUrl: 'https://instagram.com/example',
+      phoneNumber: '+1234567890',
+      whatsappNumber: '+1234567890',
     ),
     Venue(
       id: '2',
@@ -52,6 +56,10 @@ class MockDataService {
       tags: ["Quiet", "Cozy"],
       image: "placeholder",
       category: "Restaurants",
+      websiteUrl: 'https://example.com',
+      instagramUrl: 'https://instagram.com/example',
+      phoneNumber: '+1234567890',
+      whatsappNumber: '+1234567890',
     ),
     Venue(
       id: '3',
@@ -65,6 +73,10 @@ class MockDataService {
       tags: ["Family-Friendly", "Fun"],
       image: "placeholder",
       category: "Entertainment",
+      websiteUrl: 'https://example.com',
+      instagramUrl: 'https://instagram.com/example',
+      phoneNumber: '+1234567890',
+      whatsappNumber: '+1234567890',
     ),
      Venue(
       id: '4',
@@ -78,6 +90,10 @@ class MockDataService {
       tags: ["Family-Friendly", "Fun"],
       image: "placeholder",
       category: "Entertainment",
+      websiteUrl: 'https://example.com',
+      instagramUrl: 'https://instagram.com/example',
+      phoneNumber: '+1234567890',
+      whatsappNumber: '+1234567890',
     ),
         Venue(
       id: '5',
@@ -91,6 +107,10 @@ class MockDataService {
       tags: ["Family-Friendly", "Fun"],
       image: "placeholder",
       category: "Bars",
+      websiteUrl: 'https://example.com',
+      instagramUrl: 'https://instagram.com/example',
+      phoneNumber: '+1234567890',
+      whatsappNumber: '+1234567890',
     ),
         Venue(
       id: '6',
@@ -104,6 +124,10 @@ class MockDataService {
       tags: ["Family-Friendly", "Fun"],
       image: "placeholder",
       category: "Bars",
+      websiteUrl: 'https://example.com',
+      instagramUrl: 'https://instagram.com/example',
+      phoneNumber: '+1234567890',
+      whatsappNumber: '+1234567890',
     ),
   ];
 
