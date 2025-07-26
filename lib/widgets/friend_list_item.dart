@@ -5,7 +5,8 @@ import '../models.dart';
 
 class FriendListItem extends StatelessWidget {
   final OutingUser friend;
-  const FriendListItem({super.key, required this.friend});
+  final bool isRequest; 
+  const FriendListItem({super.key, required this.friend, this.isRequest = false});
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +32,10 @@ class FriendListItem extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 16),
+          if (isRequest)
+            _buildRequestButtons()
+          else
+            _buildFriendButtons(),
           OutlinedButton(
             onPressed: () {},
             style: OutlinedButton.styleFrom(
@@ -41,6 +46,39 @@ class FriendListItem extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+   Widget _buildFriendButtons() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.chat_bubble_outline, color: Colors.white70),
+          onPressed: () { /* TODO: Open chat */ },
+        ),
+        IconButton(
+          icon: const Icon(Icons.more_vert, color: Colors.white70),
+          onPressed: () { /* TODO: Show options (unfriend, etc) */ },
+        ),
+      ],
+    );
+  }
+
+  // Buttons for a friend request
+  Widget _buildRequestButtons() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.check_circle_outline, color: AppColors.auroraGreen),
+          onPressed: () { /* TODO: Accept request */ },
+        ),
+        IconButton(
+          icon: const Icon(Icons.cancel_outlined, color: AppColors.statusRed),
+          onPressed: () { /* TODO: Decline request */ },
+        ),
+      ],
     );
   }
 }

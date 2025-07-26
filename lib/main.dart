@@ -65,7 +65,7 @@ class OutingApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'OutingApp',
+      title: "Whats The Planno",
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: AppColors.darkPrimary,

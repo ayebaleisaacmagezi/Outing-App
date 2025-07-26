@@ -13,15 +13,17 @@ class AppNavProvider with ChangeNotifier {
   int get selectedIndex => _selectedIndex;
 
   set selectedIndex(int index) {
-    _selectedIndex = index;
-    notifyListeners(); // This tells the UI to rebuild
+     if (_selectedIndex != index) {
+      _selectedIndex = index;
+      notifyListeners();
+    }
   }
 }
 
 // Provider for the Discover Screen's state
 class DiscoverProvider with ChangeNotifier {
   final MockDataService _mockDataService = MockDataService();
-  static const double _nearYouRadiusMeters = 15079500; // in metres radius for "Near You"
+  static const double _nearYouRadiusMeters = 15079400; // in metres radius for "Near You"
   // This is a large radius to simulate "Near You" for testing purposes.
 
   List<String> _categories = [];
@@ -237,38 +239,64 @@ class ProfileProvider with ChangeNotifier {
 class FriendsProvider with ChangeNotifier {
   final MockDataService _mockDataService = MockDataService();
 
-  List<OutingUser> _friends = [];
+  List<OutingUser> _allFriends = [];
+  List<OutingUser> _displayedFriends = [];
+  List<OutingUser> _friendRequests = [];
   bool _isLoading = false;
-  String _searchQuery = '';
+  
+  List<OutingUser> _searchResults = [];
+  bool _isSearching = false;
 
-  List<OutingUser> get friends {
-    // Filter friends based on the search query
-    if (_searchQuery.isEmpty) {
-      return _friends;
-    } else {
-      return _friends
-          .where((friend) =>
-              friend.displayName.toLowerCase().contains(_searchQuery.toLowerCase()))
-          .toList();
-    }
-  }
-
+  List<OutingUser> get friends => _displayedFriends;
+  List<OutingUser> get allFriends => _allFriends;
+  List<OutingUser> get friendRequests => _friendRequests;
   bool get isLoading => _isLoading;
+  List<OutingUser> get searchResults => _searchResults;
+  bool get isSearching => _isSearching;
 
   FriendsProvider() {
     fetchFriends();
   }
 
   Future<void> fetchFriends() async {
-    _isLoading = true;
+   _isLoading = true;
     notifyListeners();
-    _friends = await _mockDataService.getFriends();
+    _allFriends = await _mockDataService.getFriends();
+    _friendRequests =  await _mockDataService.getFriendRequests();
+    _displayedFriends = _allFriends;
     _isLoading = false;
     notifyListeners();
   }
+  
+  // Searches your EXISTING friends list on the main FriendsScreen
+  void searchMyFriends(String query) {
+    if (query.isEmpty) {
+      _displayedFriends = _allFriends;
+    } else {
+      _displayedFriends = _allFriends
+          .where((friend) =>
+              friend.displayName.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    }
+    notifyListeners();
+  }
 
-  void search(String query) {
-    _searchQuery = query;
+   // THIS IS THE ONLY SEARCH METHOD WE NEED NOW
+  Future<void> searchAllUsers(String query) async {
+    if (query.trim().isEmpty) {
+      _searchResults = [];
+      _isSearching = false;
+      notifyListeners();
+      return;
+    }
+
+    _isSearching = true;
+    notifyListeners();
+
+    // In a real app, this would be a Firestore query.
+    _searchResults = await _mockDataService.searchUsers(query);
+    
+    _isSearching = false;
     notifyListeners();
   }
 }

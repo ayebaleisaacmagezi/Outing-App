@@ -1,6 +1,7 @@
 // lib/services/auth_service.dart
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
   // Get an instance of Firebase Auth
@@ -57,7 +58,40 @@ class AuthService {
       return null;
     }
   }
+  
+  // --- 2. ADD THE NEW signInWithGoogle METHOD ---
+  Future<User?> signInWithGoogle() async {
+    try {
+      // 2a. Trigger the Google Authentication flow.
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
+      // If the user cancels the flow, googleUser will be null.
+      if (googleUser == null) {
+        return null;
+      }
+
+      // 2b. Obtain the auth details from the request.
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      // 2c. Create a new credential for Firebase.
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // 2d. Once signed in, return the UserCredential from Firebase.
+      UserCredential userCredential = await _auth.signInWithCredential(credential);
+      return userCredential.user;
+      
+    } on FirebaseAuthException catch (e) {
+      print("Firebase Auth Exception on Google Sign In: ${e.message}");
+      return null;
+    } catch (e) {
+      print("An unexpected error occurred during Google sign in: $e");
+      return null;
+    }
+  }
+  
   Future<void> signOut() async {
   try {
     await _auth.signOut();

@@ -24,7 +24,7 @@ class AuthScaffold extends StatelessWidget {
                     shaderCallback: (bounds) =>
                         AppGradients.aurora.createShader(bounds),
                     child: const Text(
-                      'OutingApp',
+                      'Whats The Planno',
                       style: TextStyle(
                         fontSize: 40,
                         fontWeight: FontWeight.bold,

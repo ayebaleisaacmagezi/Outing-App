@@ -13,11 +13,13 @@ class MockDataService {
   ];
 
   // Hard-coded list of mock friends
-   final List<OutingUser> _friends = [
+   final List<OutingUser> _allUsersInApp = [
     OutingUser(uid: 'friend1', displayName: 'Alex Ray', email: 'alex@example.com', streak: 25, photoUrl: 'placeholder'),
     OutingUser(uid: 'friend2', displayName: 'Mia Wong', email: 'mia@example.com', streak: 18, photoUrl: 'placeholder'),
     OutingUser(uid: 'friend3', displayName: 'Leo Chen', email: 'leo@example.com', streak: 5, photoUrl: 'placeholder'),
     OutingUser(uid: 'friend4', displayName: 'Zoe Garcia', email: 'zoe@example.com', streak: 31, photoUrl: 'placeholder'),
+    OutingUser(uid: 'req1', displayName: 'Casey Becker', email: 'casey@example.com', streak: 0, photoUrl: 'placeholder'),
+    OutingUser(uid: 'req2', displayName: 'David Reed', email: 'david@example.com', streak: 0, photoUrl: 'placeholder'),
   ];
   final List<Game> _games = [
     Game(id: 'g1', title: 'Photo Scavenger Hunt', description: 'Complete photo challenges with friends.', icon: Icons.camera_alt),
@@ -140,6 +142,7 @@ class MockDataService {
     photoUrl: 'placeholder',
   );
 
+
   // A method to simulate fetching venues from a network
   Future<List<Venue>> getVenues() async {
     await Future.delayed(const Duration(milliseconds: 800));
@@ -154,9 +157,26 @@ class MockDataService {
 
   Future<List<OutingUser>> getFriends() async {
     await Future.delayed(const Duration(milliseconds: 600));
-    return _friends;
+    return _allUsersInApp.sublist(0, 4);
   }
-Future<List<Game>> getGames() async {
+
+  Future<List<OutingUser>> getFriendRequests() async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    return _allUsersInApp.sublist(4, 6); // Return only the last two users as friend requests
+
+  }
+  Future<List<OutingUser>> searchUsers(String query) async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    if (query.isEmpty) {
+      return [];
+    }
+    return _allUsersInApp
+        .where((user) =>
+            user.displayName.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+  }
+
+  Future<List<Game>> getGames() async {
     await Future.delayed(const Duration(milliseconds: 400));
     return _games;
   }

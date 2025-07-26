@@ -66,6 +66,33 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+   void _handleGoogleSignIn() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final user = await _authService.signInWithGoogle();
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (user != null && mounted) {
+      print("Google Sign-In successful! User: ${user.uid}");
+      // The AuthGate will handle navigation automatically, but we can
+      // push a new route just in case.
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        (route) => false,
+      );
+    } else if (mounted) {
+      // Handle the case where the user cancels the sign-in flow
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Google Sign-In was cancelled or failed.')),
+      );
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               Expanded(
                 child: AuthSocialButton(
-                  onPressed: () {},
+                  onPressed: _isLoading ? () {} : _handleGoogleSignIn,
                   iconPath: 'assets/images/google_logo.svg',
                   label: 'Google',
                 ),
