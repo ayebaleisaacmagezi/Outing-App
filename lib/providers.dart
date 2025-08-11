@@ -317,7 +317,32 @@ class GameProvider with ChangeNotifier {
   Future<void> fetchGames() async {
     _isLoading = true;
     notifyListeners();
-    _games = await _mockDataService.getGames();
+    await Future.delayed(const Duration(milliseconds: 400));
+    _games = [Game(
+        id: '1',
+        title: 'Trivia Night',
+        description: 'Test your knowledge against friends.',
+        icon: Icons.question_answer_outlined,
+      ),
+      Game(
+        id: '2',
+        title: '2 Truths 1 Lie',
+        description: 'Can you spot the fibber?',
+        icon: Icons.record_voice_over_outlined,
+      ),
+      Game(
+        id: '3',
+        title: 'Outing Roulette',
+        description: 'Spin the wheel to pick a place.',
+        icon: Icons.casino_outlined,
+      ),
+      Game(
+        id: '4',
+        title: 'City Scavenger Hunt',
+        description: 'Complete challenges around town.',
+        icon: Icons.location_on_outlined,
+      ),
+    ];
     _isLoading = false;
     notifyListeners();
   }
