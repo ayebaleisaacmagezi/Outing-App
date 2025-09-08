@@ -27,6 +27,16 @@ class MockDataService {
     Game(id: 'g3', title: 'Outing Bingo', description: 'Complete a bingo card of fun activities.', icon: Icons.grid_on),
     Game(id: 'g4', title: 'Dare Drop', description: 'Challenge your friends to hilarious dares.', icon: Icons.local_fire_department),
   ];
+
+  List<OutingUser> _myFriends = [];
+  List<OutingUser> _myFriendRequests = [];
+
+  MockDataService() {
+    // Initialize the data when the service is created
+    _myFriends = _allUsersInApp.sublist(0, 2); // Start with Alex and Mia as friends
+    _myFriendRequests = _allUsersInApp.sublist(4, 6); // Casey and David are friend requests
+  }
+
   // Hard-coded list of venues from the original app
   final List<Venue> _venues = [
     Venue(
@@ -157,12 +167,12 @@ class MockDataService {
 
   Future<List<OutingUser>> getFriends() async {
     await Future.delayed(const Duration(milliseconds: 600));
-    return _allUsersInApp.sublist(0, 4);
+    return List.from(_myFriends);
   }
 
   Future<List<OutingUser>> getFriendRequests() async {
     await Future.delayed(const Duration(milliseconds: 200));
-    return _allUsersInApp.sublist(4, 6); // Return only the last two users as friend requests
+    return List.from(_myFriendRequests); // Return only the last two users as friend requests
 
   }
   Future<List<OutingUser>> searchUsers(String query) async {
@@ -170,11 +180,37 @@ class MockDataService {
     if (query.isEmpty) {
       return [];
     }
-    return _allUsersInApp
-        .where((user) =>
-            user.displayName.toLowerCase().contains(query.toLowerCase()))
-        .toList();
+    final existingIds = {..._myFriends.map((u) => u.uid), ..._myFriendRequests.map((u) => u.uid)};
+    return _allUsersInApp.where((user) {
+        final isExisting = existingIds.contains(user.uid);
+      final matchesQuery = user.displayName.toLowerCase().contains(query.toLowerCase());
+      return !isExisting && matchesQuery;
+    }).toList();
   }
+
+  // Simulates sending a friend request. In a real app, this would write to Firestore.
+  Future<void> sendFriendRequest(OutingUser user) async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    print("Simulating: Sent friend request to ${user.displayName}.");
+  }
+
+  // Simulates accepting a friend request by moving a user from one list to another.
+  Future<void> acceptFriendRequest(OutingUser user) async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    _myFriendRequests.removeWhere((u) => u.uid == user.uid);
+    if (!_myFriends.any((u) => u.uid == user.uid)) {
+      _myFriends.add(user);
+    }
+    print("Simulating: Accepted friend request from ${user.displayName}.");
+  }
+
+  // Simulates declining a friend request by removing the user from the requests list.
+  Future<void> declineFriendRequest(OutingUser user) async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    _myFriendRequests.removeWhere((u) => u.uid == user.uid);
+    print("Simulating: Declined friend request from ${user.displayName}.");
+  }
+
 
   Future<List<Game>> getGames() async {
     await Future.delayed(const Duration(milliseconds: 400));

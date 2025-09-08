@@ -1,5 +1,7 @@
 // lib/widgets/friend_list_item.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers.dart';
 import '../main.dart' show AppColors;
 import '../models.dart';
 
@@ -33,50 +35,46 @@ class FriendListItem extends StatelessWidget {
           ),
           const SizedBox(width: 16),
           if (isRequest)
-            _buildRequestButtons()
+            _buildRequestButtons(context)
           else
-            _buildFriendButtons(),
-          OutlinedButton(
-            onPressed: () {},
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            ),
-            child: const Text('Invite'),
-          ),
+            _buildFriendButtons(context),
         ],
       ),
     );
   }
 
-   Widget _buildFriendButtons() {
+   Widget _buildFriendButtons(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         IconButton(
           icon: const Icon(Icons.chat_bubble_outline, color: Colors.white70),
           onPressed: () { /* TODO: Open chat */ },
+          tooltip: 'Chat',
         ),
         IconButton(
           icon: const Icon(Icons.more_vert, color: Colors.white70),
           onPressed: () { /* TODO: Show options (unfriend, etc) */ },
+          tooltip: 'Options',
         ),
       ],
     );
   }
 
   // Buttons for a friend request
-  Widget _buildRequestButtons() {
+  Widget _buildRequestButtons(BuildContext context) {
+    final provider = context.read<FriendsProvider>();
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         IconButton(
-          icon: const Icon(Icons.check_circle_outline, color: AppColors.auroraGreen),
-          onPressed: () { /* TODO: Accept request */ },
+          icon: const Icon(Icons.check_circle_outline, color: AppColors.auroraGreen),          onPressed: () => provider.acceptFriendRequest(friend),
+          tooltip: 'Accept',
         ),
         IconButton(
           icon: const Icon(Icons.cancel_outlined, color: AppColors.statusRed),
-          onPressed: () { /* TODO: Decline request */ },
+          tooltip: 'Decline',
+          onPressed: () => provider.declineFriendRequest(friend),
         ),
       ],
     );

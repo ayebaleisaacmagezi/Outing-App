@@ -26,7 +26,6 @@ class DiscoverProvider with ChangeNotifier {
   static const double _nearYouRadiusMeters = 15079400; // in metres radius for "Near You"
   // This is a large radius to simulate "Near You" for testing purposes.
 
-  List<String> _categories = [];
   List<Venue> _allVenues = [];
   List<Venue> _venues = [];
   String _activeCategory = "Near You";
@@ -54,7 +53,6 @@ class DiscoverProvider with ChangeNotifier {
 
   DiscoverProvider() {
     // When the provider is created, get the initial data
-    _categories = _mockDataService.categories; // This line is the problem
     _initializeDiscoverFeed();
   }
 
@@ -137,31 +135,7 @@ class DiscoverProvider with ChangeNotifier {
     _venues = filtered;
   }
 
-  void _filterVenues() {
-    if (_activeCategory == "Near You") {
-      if (_currentPosition != null) {
-        // We have a location, so filter by distance.
-        _venues = _allVenues.where((venue) {
-          final distance = Geolocator.distanceBetween(
-            _currentPosition!.latitude,
-            _currentPosition!.longitude,
-            venue.latitude,
-            venue.longitude,
-          );
-          return distance <= _nearYouRadiusMeters;
-        }).toList();
-      } else {
-        // No location, so "Near You" shows nothing or everything.
-        // Showing all is a safe fallback.
-        _venues = _allVenues;
-      }
-    } else {
-      // Standard category filtering.
-      _venues = _allVenues
-      .where((venue) => venue.category == _activeCategory)
-      .toList();
-  }
-  }
+
 
 
    // Handles all location permission logic.
@@ -239,7 +213,10 @@ class ProfileProvider with ChangeNotifier {
 class FriendsProvider with ChangeNotifier {
   final MockDataService _mockDataService = MockDataService();
 
+
   List<OutingUser> _allFriends = [];
+  
+  // This is the list the UI shows. It changes when the user searches.
   List<OutingUser> _displayedFriends = [];
   List<OutingUser> _friendRequests = [];
   bool _isLoading = false;
@@ -248,27 +225,31 @@ class FriendsProvider with ChangeNotifier {
   bool _isSearching = false;
 
   List<OutingUser> get friends => _displayedFriends;
-  List<OutingUser> get allFriends => _allFriends;
   List<OutingUser> get friendRequests => _friendRequests;
   bool get isLoading => _isLoading;
   List<OutingUser> get searchResults => _searchResults;
   bool get isSearching => _isSearching;
 
   FriendsProvider() {
-    fetchFriends();
+    fetchData();
   }
 
-  Future<void> fetchFriends() async {
+  Future<void> fetchData() async {
    _isLoading = true;
     notifyListeners();
-    _allFriends = await _mockDataService.getFriends();
-    _friendRequests =  await _mockDataService.getFriendRequests();
+    // Use Future.wait to run calls concurrently
+    final results = await Future.wait([
+      _mockDataService.getFriends(),
+      _mockDataService.getFriendRequests(),
+    ]);
+    _allFriends = results[0];
+    _friendRequests = results[1];
     _displayedFriends = _allFriends;
     _isLoading = false;
     notifyListeners();
   }
   
-  // Searches your EXISTING friends list on the main FriendsScreen
+   // Search for your EXISTING friends (for the main FriendsScreen)
   void searchMyFriends(String query) {
     if (query.isEmpty) {
       _displayedFriends = _allFriends;
@@ -280,7 +261,7 @@ class FriendsProvider with ChangeNotifier {
     }
     notifyListeners();
   }
-
+  
    // THIS IS THE ONLY SEARCH METHOD WE NEED NOW
   Future<void> searchAllUsers(String query) async {
     if (query.trim().isEmpty) {
@@ -299,6 +280,23 @@ class FriendsProvider with ChangeNotifier {
     _isSearching = false;
     notifyListeners();
   }
+  
+  Future<void> acceptFriendRequest(OutingUser user) async {
+    await _mockDataService.acceptFriendRequest(user);
+    await fetchData(); // Refresh all data
+  }
+
+  Future<void> declineFriendRequest(OutingUser user) async {
+    await _mockDataService.declineFriendRequest(user);
+    await fetchData(); // Refresh all data
+  }
+  
+  Future<void> sendFriendRequest(OutingUser user) async {
+    await _mockDataService.sendFriendRequest(user);
+    // Refresh search results to remove the user you just added
+    searchAllUsers('');
+  }
+
 }
 
 class GameProvider with ChangeNotifier {
