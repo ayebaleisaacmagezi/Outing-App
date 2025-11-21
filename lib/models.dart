@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart'; // <-- ADD THIS IMPORT
+import 'package:flutter/material.dart';
 
 class Venue {
   final String id;
@@ -15,7 +15,7 @@ class Venue {
   final String? websiteUrl;
   final String? instagramUrl;
   final String? phoneNumber;
-  final String? whatsappNumber;
+  final String? tiktok;
   final bool isFavorite;
 
   Venue({
@@ -33,7 +33,7 @@ class Venue {
     this.websiteUrl,
     this.instagramUrl,
     this.phoneNumber,
-    this.whatsappNumber,
+    this.tiktok,
     this.isFavorite = false,
   });
 }

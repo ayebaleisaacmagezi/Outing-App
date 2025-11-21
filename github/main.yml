@@ -1,0 +1,45 @@
+# .github/workflows/main.yml
+
+name: Build and Deploy Flutter Web to Firebase
+
+# This workflow runs automatically on every push to the 'main' branch
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  build_and_deploy:
+    # Use a standard Linux environment to run the job
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checks out your repository's code so the workflow can access it
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      # Step 2: Sets up the Flutter SDK in the environment
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.0' # Or your specific Flutter version
+          channel: 'stable'
+          cache: true # Speeds up future builds by caching dependencies
+
+      # Step 3: Gets all the Flutter packages listed in your pubspec.yaml
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      # Step 4: Builds the release version of your web app
+      # The output will be in the 'build/web' directory
+      - name: Build Flutter Web
+        run: flutter build web --release
+
+      # Step 5: Deploys the content of 'build/web' to Firebase Hosting
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_WHATS_THE_PLANNO }}' # IMPORTANT: Secret key
+          channelId: live
+          projectId: 'whats-the-planno' # Your Firebase Project ID

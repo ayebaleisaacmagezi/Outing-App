@@ -12,8 +12,9 @@ class PlaceDetailScreen extends StatefulWidget {
 
   const PlaceDetailScreen({super.key, required this.venue});
 
-   @override
-  State<PlaceDetailScreen> createState() => _PlaceDetailScreenState();
+  @override
+  State<PlaceDetailScreen> createState() => 
+  _PlaceDetailScreenState();
 }
 
 class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
@@ -62,6 +63,64 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
       // You can show a SnackBar or Toast here in a real app
       print('Could not launch $url');
     }
+  }
+  
+  void _showRideOptionsBottomSheet(BuildContext context) {
+    final lat = widget.venue.latitude;
+    final lon = widget.venue.longitude;
+    final venueName = Uri.encodeComponent(widget.venue.name);
+      // This is the universal "show me ride options" link.
+  // It opens Google Maps to the directions screen, where the user can
+  // then tap the "Ride Services" tab to see Uber, SafeBoda, etc.
+  final universalRideUrl = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lon');
+
+  // This is the direct deep link specifically for Uber.
+  final uberUrl = Uri.parse('https://m.uber.com/ul/?action=setPickup&pickup=current_location&dropoff[latitude]=$lat&dropoff[longitude]=$lon&dropoff[nickname]=$venueName');
+
+   // Helper function to launch a URL with error handling
+  Future<void> _launch(Uri url, String appName) async {
+    Navigator.pop(context); // Close the bottom sheet first
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Could not open $appName. Is it installed?")),
+      );
+    }
+  }
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.darkSecondary,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        // ... the rest of the bottom sheet code goes here
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                leading: const Icon(Icons.drive_eta, color: AppColors.electricCyan),
+                title: const Text('Get Directions with Google Maps'),
+                onTap: () => _launch(universalRideUrl, 'Google Maps'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.local_taxi, color: AppColors.electricCyan),
+                title: const Text('Ride with Uber'),
+                onTap: () => _launch(uberUrl, 'Uber'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.two_wheeler, color: AppColors.electricCyan),
+                title: const Text('Ride with SafeBoda'),
+                onTap: () => _launch(universalRideUrl, 'a ride-sharing app'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -145,10 +204,11 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
         titlePadding: const EdgeInsets.only(left: 60, bottom: 16),
         background: Hero(
           tag: 'venue-image-${widget.venue.id}',
-          child: SvgPicture.asset(
-          'assets/images/placeholder.svg', // Using a placeholder for now
+          child: Image.asset(
+          widget.venue.image, // Using a placeholder for now
           fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(AppColors.electricCyan.withOpacity(0.3), BlendMode.srcIn),
+          color: Colors.black.withOpacity(0.4),
+          colorBlendMode: BlendMode.darken,
           ),
         ),
       ),
@@ -238,9 +298,9 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
           if (widget.venue.instagramUrl != null)
             _buildContactIcon(Icons.photo_camera_outlined, 'Instagram', () => _launchUrl(widget.venue.instagramUrl!)),
           if (widget.venue.phoneNumber != null)
-            _buildContactIcon(Icons.phone_outlined, 'Call to book or inquire', () => _launchUrl('tel:${widget.venue.phoneNumber!}')),
-          if (widget.venue.whatsappNumber != null)
-            _buildContactIcon(Icons.chat_bubble_outline, 'WhatsApp', () => _launchUrl('https://wa.me/${widget.venue.whatsappNumber!}')),
+            _buildContactIcon(Icons.phone_outlined, 'Call', () => _launchUrl('tel:${widget.venue.phoneNumber!}')),
+          if (widget.venue.tiktok != null)
+            _buildContactIcon(Icons.tiktok, 'TikTok', () => _launchUrl(widget.venue.tiktok!)),
         ],
       ),
     );
@@ -280,7 +340,7 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
         ),
         child: GlowButton(
           onPressed: () {
-            _launchMaps(); // Launch maps to the venue location
+            _showRideOptionsBottomSheet(context); // Launch maps to the venue location
             // TODO: Integrate with Uber/ Safe boda
           },
           gradient: AppGradients.aurora,

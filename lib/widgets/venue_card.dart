@@ -17,7 +17,7 @@ class VenueCard extends StatelessWidget {
     this.currentPosition,
   });
 
-  String _getFormattedDistance() {
+  String _getFormattedTravelInfo() {
     if (currentPosition == null) return '';
     final distanceInMeters = Geolocator.distanceBetween(
       currentPosition!.latitude,
@@ -25,14 +25,26 @@ class VenueCard extends StatelessWidget {
       venue.latitude,
       venue.longitude,
     );
-    return '${(distanceInMeters / 1000).toStringAsFixed(1)} km';
+    final distanceInKm = distanceInMeters / 1000;
+    // Simulate travel time. Assume an average speed of 25 km/h in the city.
+    // This is a great placeholder until you implement a real Directions API.
+    const averageSpeedKmh = 25.0; 
+    final timeInHours = (distanceInMeters / 1000) / averageSpeedKmh;
+    final timeInMinutes = (timeInHours * 60).round();
+
+    if (timeInMinutes < 1) {
+      return "~1 min drive";
+    }
+    
+    // We use a tilde (~) to indicate it's an estimate
+    return "~$timeInMinutes min drive";
   }
 
   @override
   Widget build(BuildContext context) {
     final bool isOpen = venue.status == 'Open';
     final statusColor = isOpen ? AppColors.auroraGreen : AppColors.statusRed;
-    final String displayDistance = _getFormattedDistance();
+    final String travelInfo = _getFormattedTravelInfo();
 
     return GestureDetector(
       onTap: () {
@@ -124,8 +136,8 @@ class VenueCard extends StatelessWidget {
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      if (displayDistance.isNotEmpty) ...[
-                        Text(displayDistance, style: TextStyle(color: Colors.grey[400])),
+                      if (travelInfo.isNotEmpty) ...[
+                        Text(travelInfo, style: TextStyle(color: Colors.grey[400])),
                         const SizedBox(width: 16),
                       ],
                       Text(venue.price, style: TextStyle(color: Colors.grey[400])),

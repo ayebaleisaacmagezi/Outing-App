@@ -118,6 +118,7 @@ class _SearchSection extends StatelessWidget {
   const _SearchSection();
   @override
   Widget build(BuildContext context) {
+    final currentAddress = context.watch<DiscoverProvider>().currentAddress;
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -139,7 +140,7 @@ class _SearchSection extends StatelessWidget {
                     const Icon(Icons.location_on_outlined,
                         color: AppColors.electricCyan, size: 16),
                     const SizedBox(width: 8),
-                    Text("Downtown Area",
+                    Text(currentAddress,
                         style: TextStyle(color: Colors.grey[300])),
                   ],
                 ),
@@ -187,7 +188,7 @@ class _CategoriesRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
       child: SizedBox(
-        height: 36,
+        height: 40,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -196,36 +197,44 @@ class _CategoriesRow extends StatelessWidget {
             final category = categories[index];
             final bool isActive = category == activeCategory;
             
-            Widget button = OutlinedButton(
-              onPressed: () => onCategorySelected(category),
-              style: Theme.of(context).outlinedButtonTheme.style?.copyWith(
-                    padding: const MaterialStatePropertyAll(EdgeInsets.symmetric(horizontal: 16)),
-                    textStyle: const MaterialStatePropertyAll(TextStyle(fontWeight: FontWeight.w500)),
-              ),
-              child: Text(category),
-            );
-
-            if (isActive) {
-              return Container(
-                margin: const EdgeInsets.only(right: 8.0),
-                decoration: BoxDecoration(
-                  gradient: AppGradients.aurora,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
-                    backgroundColor: const MaterialStatePropertyAll(Colors.transparent),
-                    shadowColor: const MaterialStatePropertyAll(Colors.transparent),
-                  ),
-                  child: Text(category),
-                ),
-              );
-            }
-
             return Padding(
               padding: const EdgeInsets.only(right: 8.0),
-              child: button,
+              // Use ElevatedButton as the base for consistent sizing
+              child: ElevatedButton(
+                onPressed: () => onCategorySelected(category),
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.zero, // Remove default padding to allow Ink to fill
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  // Add the border for the inactive state, remove for active
+                  side: isActive
+                      ? BorderSide.none
+                      : BorderSide(color: AppColors.electricCyan.withOpacity(0.3)),
+                ),
+                child: Ink(
+                  decoration: BoxDecoration(
+                    // Apply gradient ONLY if active
+                    gradient: isActive ? AppGradients.aurora : null,
+                    // If not active, the background is handled by the button's transparent color
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    alignment: Alignment.center,
+                    child: Text(
+                      category,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        // Change text color based on state
+                        color: isActive ? AppColors.darkPrimary : AppColors.electricCyan,
+                      ),
+                    ),
+                  ),
+                ),
+              ),  
             );
           },
         ),

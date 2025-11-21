@@ -5,6 +5,7 @@ import 'models.dart';
 import '../services/auth_service.dart'; 
 import 'services/mock_data_service.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 
 // Provider to manage the selected index of the BottomNavigationBar
 class AppNavProvider with ChangeNotifier {
@@ -40,6 +41,8 @@ class DiscoverProvider with ChangeNotifier {
   List<Venue> get venues => _venues;
   bool get isLoading => _isLoading;
   Position? get currentPosition => _currentPosition;
+  String _currentAddress = "Fetching location...";
+  String get currentAddress => _currentAddress;
   String get activeCategory => _activeCategory;
 
    // Getters for the Filters sheet UI
@@ -165,6 +168,25 @@ class DiscoverProvider with ChangeNotifier {
 
     // When we reach here, permissions are granted.
     _currentPosition = await Geolocator.getCurrentPosition();
+     try {
+    List<Placemark> placemarks = await placemarkFromCoordinates(
+      _currentPosition!.latitude,
+      _currentPosition!.longitude,
+    );
+
+    if (placemarks.isNotEmpty) {
+      final place = placemarks.first;
+      // You can customize this format. Examples:
+      // place.locality ?? place.subAdministrativeArea ?? 'Unknown Area' -> "Kampala" or "Wakiso"
+      // "${place.street}, ${place.locality}" -> "Kampala Road, Kampala"
+      _currentAddress = "${place.subLocality}, ${place.locality}"; // e.g., "Nakasero, Kampala"
+    } else {
+      _currentAddress = "Unknown Area";
+    }
+  } catch (e) {
+    print("Error getting address: $e");
+    _currentAddress = "Could not get address";
+  }
   }
 
 

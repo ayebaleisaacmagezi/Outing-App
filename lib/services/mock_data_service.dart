@@ -44,17 +44,17 @@ class MockDataService {
       name: "Yums Cafe",
       type: "Restaurant",
       rating: 4.5,
-      latitude: 37.7749,  // <-- ADD THIS
-      longitude: -122.4194,
+      latitude: 0.36051452898954917,  // <-- ADD THIS
+      longitude: 32.618359135217425,
       price: "\$\$\$",
       status: "Open",
       tags: ["Trendy", "Lively"],
-      image: "placeholder",
+      image: "assets/images/yums.jpg",
       category: "Restaurants", 
       websiteUrl: 'https://example.com',
-      instagramUrl: 'https://instagram.com/example',
-      phoneNumber: '+1234567890',
-      whatsappNumber: '+1234567890',
+      instagramUrl: 'https://www.instagram.com/yums_cafeug_/?hl=en',
+      phoneNumber: '+256744666000',
+      tiktok: 'https://www.tiktok.com/discover/yums-cafe-ntinda-menu?lang=en',
     ),
     Venue(
       id: '2',
@@ -71,7 +71,7 @@ class MockDataService {
       websiteUrl: 'https://example.com',
       instagramUrl: 'https://instagram.com/example',
       phoneNumber: '+1234567890',
-      whatsappNumber: '+1234567890',
+      tiktok: '+1234567890',
     ),
     Venue(
       id: '3',
@@ -88,7 +88,7 @@ class MockDataService {
       websiteUrl: 'https://example.com',
       instagramUrl: 'https://instagram.com/example',
       phoneNumber: '+1234567890',
-      whatsappNumber: '+1234567890',
+      tiktok: '+1234567890',
     ),
      Venue(
       id: '4',
@@ -105,7 +105,7 @@ class MockDataService {
       websiteUrl: 'https://example.com',
       instagramUrl: 'https://instagram.com/example',
       phoneNumber: '+1234567890',
-      whatsappNumber: '+1234567890',
+      tiktok: '+1234567890',
     ),
         Venue(
       id: '5',
@@ -122,7 +122,7 @@ class MockDataService {
       websiteUrl: 'https://example.com',
       instagramUrl: 'https://instagram.com/example',
       phoneNumber: '+1234567890',
-      whatsappNumber: '+1234567890',
+      tiktok: '+1234567890',
     ),
         Venue(
       id: '6',
@@ -139,7 +139,7 @@ class MockDataService {
       websiteUrl: 'https://example.com',
       instagramUrl: 'https://instagram.com/example',
       phoneNumber: '+1234567890',
-      whatsappNumber: '+1234567890',
+      tiktok: '+1234567890',
     ),
   ];
 
